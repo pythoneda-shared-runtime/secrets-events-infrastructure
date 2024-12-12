@@ -1,10 +1,10 @@
 # vim: set fileencoding=utf-8
 """
-pythoneda/runtime/secrets/events/infrastructure/__init__.py
+pythoneda/shared/runtime/__init__.py
 
-This file ensures pythoneda.runtime.secrets.events.infrastructure is a namespace.
+This file ensures pythoneda.shared.runtime is a namespace.
 
-Copyright (C) 2024-today rydnr's pythoneda-runtime/secrets-events-infrastructure
+Copyright (C) 2024-today rydnr's pythoneda-shared-runtime/secrets-events-infrastructure
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

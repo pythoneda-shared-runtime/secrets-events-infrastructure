@@ -1,10 +1,10 @@
 # vim: set fileencoding=utf-8
 """
-pythoneda/runtime/secrets/events/infrastructure/dbus/dbus_credential_requested.py
+pythoneda/shared/runtime/secrets/events/infrastructure/dbus/dbus_credential_requested.py
 
 This file defines the DbusCredentialRequested class.
 
-Copyright (C) 2024-today rydnr's pythoneda-runtime/secrets-events-infrastructure
+Copyright (C) 2024-today rydnr's pythoneda-shared-runtime/secrets-events-infrastructure
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

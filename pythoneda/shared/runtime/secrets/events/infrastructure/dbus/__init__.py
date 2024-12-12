@@ -1,8 +1,8 @@
 # vim: set fileencoding=utf-8
 """
-pythoneda/__init__.py
+pythoneda/shared/runtime/secrets/events/infrastructure/dbus/__init__.py
 
-This file ensures pythoneda is a namespace.
+This file ensures pythoneda.shared.runtime.secrets.events.infrastructure.dbus is a namespace.
 
 Copyright (C) 2024-today rydnr's pythoneda-shared-runtime/secrets-events-infrastructure
 
@@ -20,6 +20,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 __path__ = __import__("pkgutil").extend_path(__path__, __name__)
+
+DBUS_PATH = "/pythoneda/artifact"
+
+from .dbus_credential_issued import DbusCredentialIssued
+from .dbus_credential_provided import DbusCredentialProvided
+from .dbus_credential_requested import DbusCredentialRequested
+
 # vim: syntax=python ts=4 sw=4 sts=4 tw=79 sr et
 # Local Variables:
 # mode: python
