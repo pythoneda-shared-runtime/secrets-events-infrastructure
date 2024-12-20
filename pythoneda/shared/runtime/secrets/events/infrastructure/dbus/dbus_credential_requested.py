@@ -23,8 +23,8 @@ from dbus_next import BusType, Message
 from dbus_next.service import ServiceInterface, signal
 import json
 from pythoneda.shared import BaseObject, Event
-from pythoneda.runtime.secrets.events import CredentialRequested
-from pythoneda.runtime.secrets.events.infrastructure.dbus import DBUS_PATH
+from pythoneda.shared.runtime.secrets.events import CredentialRequested
+from pythoneda.shared.runtime.secrets.events.infrastructure.dbus import DBUS_PATH
 from typing import List
 
 
@@ -98,8 +98,8 @@ class DbusCredentialRequested(BaseObject, ServiceInterface):
         return [
             event.name,
             json.dumps(event.metadata),
-            event.id,
             json.dumps(event.previous_event_ids),
+            event.id,
         ]
 
     @classmethod
@@ -122,13 +122,12 @@ class DbusCredentialRequested(BaseObject, ServiceInterface):
         :return: The CredentialRequested event.
         :rtype: pythoneda.runtime.secrets.events.CredentialRequested
         """
-        name, value, metadata, event_id, prev_event_ids = message.body
+        name, metadata, prev_event_ids, event_id = message.body
         return CredentialRequested(
             name,
-            value,
             json.loads(metadata),
-            event_id,
             json.loads(prev_event_ids),
+            event_id,
         )
 
 

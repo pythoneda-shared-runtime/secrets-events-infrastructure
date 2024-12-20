@@ -23,8 +23,8 @@ from dbus_next import BusType, Message
 from dbus_next.service import ServiceInterface, signal
 import json
 from pythoneda.shared import BaseObject, Event
-from pythoneda.runtime.secrets.events import CredentialProvided
-from pythoneda.runtime.secrets.events.infrastructure.dbus import DBUS_PATH
+from pythoneda.shared.runtime.secrets.events import CredentialProvided
+from pythoneda.shared.runtime.secrets.events.infrastructure.dbus import DBUS_PATH
 from typing import List
 
 
@@ -101,8 +101,8 @@ class DbusCredentialProvided(BaseObject, ServiceInterface):
             event.name,
             event.value,
             json.dumps(event.metadata),
-            event.id,
             json.dumps(event.previous_event_ids),
+            event.id,
         ]
 
     @classmethod
@@ -125,13 +125,13 @@ class DbusCredentialProvided(BaseObject, ServiceInterface):
         :return: The CredentialProvided event.
         :rtype: pythoneda.runtime.secrets.events.CredentialProvided
         """
-        name, value, metadata, event_id, prev_event_ids = message.body
+        name, value, metadata, prev_event_ids, event_id = message.body
         return CredentialProvided(
             name,
             value,
             json.loads(metadata),
-            event_id,
             json.loads(prev_event_ids),
+            event_id,
         )
 
 
