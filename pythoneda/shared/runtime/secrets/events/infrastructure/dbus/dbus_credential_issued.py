@@ -22,11 +22,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from dbus_next import Message
 from dbus_next.service import signal
 import json
-from pythoneda.shared import Event
+from pythoneda.shared import Event, Invariants, PythonedaApplication
 from pythoneda.shared.infrastructure.dbus import DbusEvent
 from pythoneda.shared.runtime.secrets.events import CredentialIssued
 from pythoneda.shared.runtime.secrets.events.infrastructure.dbus import DBUS_PATH
-from typing import List, Type
+from typing import List, Tuple, Type
 
 
 class DbusCredentialIssued(DbusEvent):
@@ -46,7 +46,17 @@ class DbusCredentialIssued(DbusEvent):
         """
         Creates a new DbusCredentialIssued.
         """
-        super().__init__("Pythoneda_Secrets_CredentialIssued", DBUS_PATH)
+        super().__init__(DBUS_PATH)
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        """
+        Retrieves the d-bus interface name.
+        :return: Such value.
+        :rtype: str
+        """
+        return "Pythoneda_Secrets_CredentialIssued"
 
     @signal()
     def CredentialIssued(self, name: "s", value: "s", metadata: "s"):
@@ -69,7 +79,7 @@ class DbusCredentialIssued(DbusEvent):
         :return: Such value.
         :rtype: str
         """
-        return self.path + "/" + event.name.replace("-", "_")
+        return self.path
 
     @classmethod
     def transform(cls, event: CredentialIssued) -> List[str]:
@@ -85,6 +95,7 @@ class DbusCredentialIssued(DbusEvent):
             event.value,
             json.dumps(event.metadata),
             json.dumps(event.previous_event_ids),
+            Invariants.instance().to_json(event),
             event.id,
         ]
 
@@ -97,24 +108,31 @@ class DbusCredentialIssued(DbusEvent):
         :return: The signature.
         :rtype: str
         """
-        return "sssss"
+        return "ssssss"
 
     @classmethod
-    def parse(cls, message: Message) -> CredentialIssued:
+    def parse(
+        cls, message: Message, app: PythonedaApplication
+    ) -> Tuple[str, CredentialIssued]:
         """
         Parses given d-bus message containing a CredentialIssued event.
         :param message: The message.
         :type message: dbus_next.Message
-        :return: The CredentialIssued event.
-        :rtype: pythoneda.runtime.secrets.events.CredentialIssued
+        :param app: The application instance.
+        :type app: pythoneda.shared.PythonedaApplication
+        :return: A tuple with the serialized invariants and the CredentialIssued event.
+        :rtype: Tuple[str, pythoneda.runtime.secrets.events.CredentialIssued]
         """
-        name, value, metadata, prev_event_ids, event_id = message.body
-        return CredentialIssued(
-            name,
-            value,
-            json.loads(metadata),
-            json.loads(prev_event_ids),
-            event_id,
+        name, value, metadata, prev_event_ids, invariants, event_id = message.body
+        return (
+            invariants,
+            CredentialIssued(
+                name,
+                value,
+                json.loads(metadata),
+                json.loads(prev_event_ids),
+                event_id,
+            ),
         )
 
     @classmethod

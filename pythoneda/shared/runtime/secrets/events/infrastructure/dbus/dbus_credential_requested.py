@@ -22,11 +22,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 from dbus_next import Message
 from dbus_next.service import signal
 import json
-from pythoneda.shared import Event
+from pythoneda.shared import Event, Invariants, PythonedaApplication
 from pythoneda.shared.infrastructure.dbus import DbusEvent
 from pythoneda.shared.runtime.secrets.events import CredentialRequested
 from pythoneda.shared.runtime.secrets.events.infrastructure.dbus import DBUS_PATH
-from typing import List, Type
+from typing import List, Tuple, Type
 
 
 class DbusCredentialRequested(DbusEvent):
@@ -46,7 +46,17 @@ class DbusCredentialRequested(DbusEvent):
         """
         Creates a new DbusCredentialRequested.
         """
-        super().__init__("Pythoneda_Secrets_CredentialRequested", DBUS_PATH)
+        super().__init__(DBUS_PATH)
+
+    @classmethod
+    @property
+    def name(cls) -> str:
+        """
+        Retrieves the d-bus interface name.
+        :return: Such value.
+        :rtype: str
+        """
+        return "Pythoneda_Secrets_CredentialRequested"
 
     @signal()
     def CredentialRequested(self, name: "s", metadata: "s"):
@@ -67,7 +77,7 @@ class DbusCredentialRequested(DbusEvent):
         :return: Such value.
         :rtype: str
         """
-        return self.path + "/" + event.name.replace("-", "_")
+        return self.path
 
     @classmethod
     def transform(cls, event: CredentialRequested) -> List[str]:
@@ -82,6 +92,7 @@ class DbusCredentialRequested(DbusEvent):
             event.name,
             json.dumps(event.metadata),
             json.dumps(event.previous_event_ids),
+            Invariants.instance().to_json(event),
             event.id,
         ]
 
@@ -94,23 +105,30 @@ class DbusCredentialRequested(DbusEvent):
         :return: The signature.
         :rtype: str
         """
-        return "ssss"
+        return "sssss"
 
     @classmethod
-    def parse(cls, message: Message) -> CredentialRequested:
+    def parse(
+        cls, message: Message, app: PythonedaApplication
+    ) -> Tuple[str, CredentialRequested]:
         """
         Parses given d-bus message containing a CredentialRequested event.
         :param message: The message.
         :type message: dbus_next.Message
-        :return: The CredentialRequested event.
-        :rtype: pythoneda.runtime.secrets.events.CredentialRequested
+        :param app: The application instance.
+        :type app: pythoneda.shared.PythonedaApplication
+        :return: A tuple with the serialized invariants and the CredentialRequested event.
+        :rtype: Tuple[str, pythoneda.runtime.secrets.events.CredentialRequested]
         """
-        name, metadata, prev_event_ids, event_id = message.body
-        return CredentialRequested(
-            name,
-            json.loads(metadata),
-            json.loads(prev_event_ids),
-            event_id,
+        name, metadata, prev_event_ids, invariants, event_id = message.body
+        return (
+            invariants,
+            CredentialRequested(
+                name,
+                json.loads(metadata),
+                json.loads(prev_event_ids),
+                event_id,
+            ),
         )
 
     @classmethod
